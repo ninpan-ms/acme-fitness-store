@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Tasks template for modernization plan. Generate this file alongside plan.md to track individual migration tasks.",
+  "tasks": [
+    {
+      "type": "upgrade",
+      "id": "001-upgrade-java-21",
+      "description": "Upgrade the acme-catalog Java application runtime from Java 17 to Java 21 LTS",
+      "reason": "The enterprise modernization charter mandates that all Java applications target Java 21 LTS. The current application uses Java 17 (sourceCompatibility = '17' in build.gradle) and must be upgraded to comply with the rulebook policy.",
+      "requirements": "Upgrade Java source and target compatibility from 17 to 21 LTS. Update build.gradle sourceCompatibility to '21'. Ensure Spring Boot and all dependent libraries are compatible with Java 21. The project must compile and all existing tests must pass after the upgrade.",
+      "successCriteria": {
+        "passBuild": "true",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "security",
+      "id": "002-security-cve-remediation",
+      "description": "Scan all project dependencies for known CVEs and remediate any identified vulnerabilities",
+      "reason": "Security CVE remediation is a mandatory task in every modernization plan. Ensuring the application is free of known vulnerabilities is required before deployment.",
+      "requirements": "Scan all project dependencies (build.gradle) for known CVEs. Upgrade vulnerable dependencies to the minimum patched version. If a CVE fix requires a major version upgrade, document the affected dependency, the current version, the upgraded major version, and the breaking change risk. Verify that the project builds and all tests pass after remediation. The app scope is apps/acme-catalog.",
+      "environmentConfiguration": "Runtime environment: Java 21 (established by task 001-upgrade-java-21). Build tool: Gradle.",
+      "dependencies": [
+        "001-upgrade-java-21"
+      ],
+      "skills": [
+        {
+          "name": "validate-cves-and-fix",
+          "location": "builtin"
+        }
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "passUnitTests": "true"
+      }
+    }
+  ],
+  "metadata": {
+    "planName": "planii",
+    "projectName": "acme-catalog",
+    "language": "java",
+    "createdAt": "2026-06-09T02:39:10Z",
+    "version": "1.0"
+  }
+}
