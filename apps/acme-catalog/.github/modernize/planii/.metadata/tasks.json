@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Tasks template for modernization plan. Generate this file alongside plan.md to track individual migration tasks.",
+  "tasks": [
+    {
+      "type": "upgrade",
+      "id": "001-upgrade-java-21-lts",
+      "description": "Upgrade the catalog application runtime baseline from Java 17 to Java 21 LTS.",
+      "reason": "Rulebook targets require Java 21 LTS for Java modernization efforts.",
+      "requirements": "Update project build/runtime configuration to Java 21 LTS and keep existing behavior intact for the catalog service.",
+      "successCriteria": {
+        "passBuild": "true",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "transform",
+      "id": "002-transform-azure-storage-auth-patterns",
+      "description": "Modernize storage/auth integration to Azure patterns and remove AWS-aligned storage dependency paths.",
+      "reason": "Rulebook requires AWS-to-Azure migration patterns, Azure Blob usage, and Azure-first authentication and secret handling.",
+      "requirements": "Replace or remove AWS S3 SDK usage paths with Azure Blob Storage patterns, use DefaultAzureCredential for Azure services, require managed identity in production, and move connection strings to environment variables with no hardcoded credentials.",
+      "skills": [
+        {
+          "name": "migration-s3-to-azure-blob-storage",
+          "location": "builtin"
+        }
+      ],
+      "dependencies": [
+        "001-upgrade-java-21-lts"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "infrastructure",
+      "id": "003-infrastructure-blob-private-baseline",
+      "description": "Define Azure infrastructure artifacts for blob storage with mandatory security baseline settings.",
+      "reason": "Rulebook requires private blob container access and encryption-at-rest guarantees.",
+      "requirements": "Generate IaC definitions for Azure Blob Storage containers with private access level and encryption-at-rest enabled, and align authentication with managed identity in production environments.",
+      "skills": [
+        {
+          "name": "infrastructure-bicep-generation",
+          "location": "builtin"
+        }
+      ],
+      "iacType": "bicep",
+      "provision": false,
+      "dependencies": [
+        "002-transform-azure-storage-auth-patterns"
+      ]
+    },
+    {
+      "type": "security",
+      "id": "004-security-rulebook-validation",
+      "description": "Apply security and quality gates for migrated modernization scope.",
+      "reason": "Security and validation rules require explicit verification of credential handling, Azure SDK usage, and migration quality gates.",
+      "requirements": "Validate no hardcoded credentials remain, verify Azure authentication/authorization requirements are met, apply Azure SDK retry/error-handling and async API best practices where relevant, add unit tests for migrated storage operations, and ensure at least 80% coverage on migrated/new code.",
+      "dependencies": [
+        "003-infrastructure-blob-private-baseline"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "passUnitTests": "true"
+      }
+    }
+  ],
+  "metadata": {
+    "planName": "planii",
+    "projectName": "acme-catalog",
+    "language": "java",
+    "createdAt": "2026-06-09T02:10:55.766Z",
+    "version": "1.0"
+  }
+}
